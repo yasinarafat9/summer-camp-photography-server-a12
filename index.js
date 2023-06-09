@@ -6,7 +6,15 @@ const port = process.env.PORT || 5000;
 const { MongoClient, ServerApiVersion } = require('mongodb');
 
 //middleware
-app.use(cors())
+// app.use(cors())
+//pasted
+const corsOptions ={
+  origin:'*', 
+  credentials:true,
+  optionSuccessStatus:200,
+}
+
+app.use(cors(corsOptions))
 app.use(express.json());
 
 // Mongodb Driver
@@ -25,7 +33,15 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
+    // pasted 
+    const client = new MongoClient(uri, {
+      serverApi: {
+        version: ServerApiVersion.v1,
+        strict: true,
+        deprecationErrors: true,
+      }
+    });
 
     const classCollection = client.db("summerCampPhotographyDB").collection("classes");
     const instructorsCollection = client.db("summerCampPhotographyDB").collection("instructors");
