@@ -28,10 +28,16 @@ async function run() {
     await client.connect();
 
     const classCollection = client.db("summerCampPhotographyDB").collection("classes");
+    const instructorsCollection = client.db("summerCampPhotographyDB").collection("instructors");
     
 
     app.get('/classes', async(req, res) => {
         const result = await classCollection.find().toArray();
+        res.send(result);
+    })
+ 
+    app.get('/instructors', async(req, res) => {
+        const result = await instructorsCollection.find().toArray();
         res.send(result);
     })
  
