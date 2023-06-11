@@ -41,7 +41,8 @@ async function run() {
 
     const classCollection = client.db("summerCampPhotographyDB").collection("classes");
     const instructorsCollection = client.db("summerCampPhotographyDB").collection("instructors");
-    
+    const myClassesCollection = client.db("summerCampPhotographyDB").collection("myClasses");
+    const usersCollection = client.db("summerCampPhotographyDB").collection("users");
 
     app.get('/classes', async(req, res) => {
         const result = await classCollection.find().toArray();
@@ -53,6 +54,32 @@ async function run() {
         res.send(result);
     })
  
+    // my classes
+    app.post('/myClasses', async(req, res) => {
+      const myclass = req.body;
+      const result = await myClassesCollection.insertOne(myclass);
+      res.send(result);
+    })
+
+
+
+    //users apis
+    app.post('/users', async(req, res)=>{
+      const user = req.body;
+      const query = {email: user.email}
+      const existingUser = await usersCollection.findOne(query);
+
+      if(existingUser){
+        return res.send({message: 'user already exists'})
+      }
+      const result = await usersCollection.insertOne(user);
+      res.send(result);
+    })
+
+
+
+
+
 
 
 
