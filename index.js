@@ -8,10 +8,10 @@ const { MongoClient, ServerApiVersion } = require('mongodb');
 //middleware
 // app.use(cors())
 //pasted
-const corsOptions ={
-  origin:'*', 
-  credentials:true,
-  optionSuccessStatus:200,
+const corsOptions = {
+  origin: '*',
+  credentials: true,
+  optionSuccessStatus: 200,
 }
 
 app.use(cors(corsOptions))
@@ -37,25 +37,36 @@ async function run() {
     // await client.connect();
     // pasted 
     client.connect();
-    
+
 
     const classCollection = client.db("summerCampPhotographyDB").collection("classes");
     const instructorsCollection = client.db("summerCampPhotographyDB").collection("instructors");
     const myClassesCollection = client.db("summerCampPhotographyDB").collection("myClasses");
     const usersCollection = client.db("summerCampPhotographyDB").collection("users");
 
-    app.get('/classes', async(req, res) => {
-        const result = await classCollection.find().toArray();
-        res.send(result);
+    app.get('/classes', async (req, res) => {
+      const result = await classCollection.find().toArray();
+      res.send(result);
     })
- 
-    app.get('/instructors', async(req, res) => {
-        const result = await instructorsCollection.find().toArray();
-        res.send(result);
+
+    app.get('/instructors', async (req, res) => {
+      const result = await instructorsCollection.find().toArray();
+      res.send(result);
     })
- 
+
     // my classes
-    app.post('/myClasses', async(req, res) => {
+    app.get('/myClasses', async (req, res) => {
+      const email = req.query.email;
+      console.log(email);
+      if (!email) {
+        return res.send([]);
+      }
+      const query = { email: email };
+      const result = await myClassesCollection.find(query).toArray();
+      return res.send(result);
+    });
+
+    app.post('/myClasses', async (req, res) => {
       const myclass = req.body;
       const result = await myClassesCollection.insertOne(myclass);
       res.send(result);
@@ -65,18 +76,19 @@ async function run() {
 
     //users apis
 
-    app.get('/users', async (req, res)=> {
+    app.get('/users', async (req, res) => {
       const result = await usersCollection.find().toArray();
       res.send(result);
     })
 
-    app.post('/users', async(req, res)=>{
+    app.post('/users', async (req, res) => {
       const user = req.body;
-      const query = {email: user.email, name: user.displayName, photoURL: user.photoURL} // this line is edited there was email only
+      const query = { email: user.email } // this line is edited there was email only
+      // const query = {email: user.email, name: user.displayName, photoURL: user.photoURL} // this line is edited there was email only
       const existingUser = await usersCollection.findOne(query);
 
-      if(existingUser){
-        return res.send({message: 'user already exists'})
+      if (existingUser) {
+        return res.send({ message: 'user already exists' })
       }
       const result = await usersCollection.insertOne(user);
       res.send(result);
@@ -101,10 +113,10 @@ run().catch(console.dir);
 
 
 app.get('/', (req, res) => {
-    res.send('summer camp photography is running')
+  res.send('summer camp photography is running')
 })
 
-app.listen(port, ()=> {
-    console.log(`summer camp photography is running on port: ${port}`);
+app.listen(port, () => {
+  console.log(`summer camp photography is running on port: ${port}`);
 })
 
