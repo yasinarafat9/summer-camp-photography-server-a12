@@ -64,9 +64,15 @@ async function run() {
 
 
     //users apis
+
+    app.get('/users', async (req, res)=> {
+      const result = await usersCollection.find().toArray();
+      res.send(result);
+    })
+
     app.post('/users', async(req, res)=>{
       const user = req.body;
-      const query = {email: user.email}
+      const query = {email: user.email, name: user.displayName, photoURL: user.photoURL} // this line is edited there was email only
       const existingUser = await usersCollection.findOne(query);
 
       if(existingUser){
